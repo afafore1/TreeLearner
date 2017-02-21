@@ -54,7 +54,7 @@ if __name__ == "__main__":
     print("corr: ", c[0,1])
 
     # evaluate out of sample
-    predY = learner.query(testX)  # get the predictions
+    predY = TreeLearner.query(testX)  # get the predictions
     rmse = math.sqrt(((testY - predY) ** 2).sum()/testY.shape[0])
     print
     print("Out of sample results")

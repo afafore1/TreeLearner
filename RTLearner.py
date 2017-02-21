@@ -33,8 +33,10 @@ class RTLeaner(object):
         #print d.shape[0] == 1
 
         btree = self.build_tree(data)
+        btree.pop()
         print "---- PRINT BTREE ------"
         print btree
+        print "---- COMPLETED PRINTING B-TREE ----"
         return "done"
 
     def build_tree(self, d):
@@ -42,9 +44,13 @@ class RTLeaner(object):
         global node
 
         if d.shape[0] == 1:
-            return ['leaf', d[0, -1], 'NA', 'NA']
+            leafList = ['leaf', d[0, -1], 'NA', 'NA']
+            node.append(leafList)
+            return leafList
         if np.all(d[:, -1] == d[0, -1], axis=0):
-            return ['leaf', d[0, -1], 'NA', 'NA']
+            leafList = ['leaf', d[0, -1], 'NA', 'NA']
+            node.append(leafList)
+            return leafList
 
         else:
             # shaping the tree
@@ -80,8 +86,12 @@ class RTLeaner(object):
                 if leafsize > 1:
                     arr = d[:, -1]
                     meanVal = arr.mean()
-                    return ['leaf', meanVal, 'NA', 'NA']
-                return ['leaf', d[0, -1], 'NA', 'NA']
+                    leafList = ['leaf', meanVal, 'NA', 'NA']
+                    node.append(leafList)
+                    return leafList
+                leafList =['leaf', d[0, -1], 'NA', 'NA']
+                node.append(leafList)
+                return leafList
 
             # TIE CHECK
             # if there is a case where data cannot split due to ties, then find two other random values
@@ -97,43 +107,47 @@ class RTLeaner(object):
                 #randcol = random.randint(0, datacol - 2)
                 arr = d[:, -1]
                 meanVal = arr.mean()
-                return ['leaf', meanVal, 'NA', 'NA']
+                leafList = ['leaf', meanVal, 'NA', 'NA']
+                node.append(leafList)
+                return leafList
 
-            leftTree = self.build_tree(d[d[:, randcol] <= splitval])
-            rightTree = self.build_tree(d[d[:, randcol] > splitval])
-            rightTreeIndex = len(leftTree) + 1
+            leftTreeList = d[d[:, randcol] <= splitval]
+            rightTreeList = d[d[:, randcol] > splitval]
+            resultList = [randcol, splitval, 1, len(leftTreeList) + 1]
+            if np.all(d[:, -1] == d[0, -1], axis=0):
+                resultList = [randcol, splitval, 1, len(leftTreeList) + 1]
+            node.append(resultList)
+            leftTree = self.build_tree(leftTreeList)
+            rightTree = self.build_tree(rightTreeList)
+            rightTreeIndex = (len(leftTree)) + 1
             root = [randcol, splitval, 1, rightTreeIndex]
             print root
             print leftTree
             print rightTree
-            branch = root + leftTree + rightTree
-            n = node.append(branch)
-            return n
+            return node
 
     def query(self, dataX):
-        ypred = []
+        yprediction = []
         for row in dataX:
-            y = self.traverse_tree(row, 0)
-            ypred.append(y)
+            result = self.traverse_tree(row, 0)
+            yprediction.append(result)
 
-        return ypred
+        return yprediction
 
     def traverse_tree(self, d, r):
         global btree
         currNode = btree[r]
         print currNode
-        return 1
-        '''
-        if currNode[0][0] == 'leaf':
-            return currNode[1]
-        compFactor = currNode[0][0]
-        if d[compFactor] <= currNode[0][1]:
+
+        if currNode[0] == 'leaf':
+            result = currNode[1]
+            return result
+
+        compFactor = currNode[0] #compare factor is the random value chosen during creation of tree
+        if d[compFactor] <= currNode[1]:
             print(currNode[2])
             r += int(currNode[2])
 
-            self.traverse_tree(d, r)
-
         if d[compFactor] > currNode[1]:
             r += int(currNode[3])
-            self.traverse_tree(d, r)
-        '''
+        return self.traverse_tree(d, r)
