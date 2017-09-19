@@ -34,9 +34,9 @@ class RTLeaner(object):
 
         btree = self.build_tree(data)
         btree.pop()
-        print "---- PRINT BTREE ------"
-        print btree
-        print "---- COMPLETED PRINTING B-TREE ----"
+        print ("---- PRINT BTREE ------")
+        print (btree)
+        print ("---- COMPLETED PRINTING B-TREE ----")
         return "done"
 
     def build_tree(self, d):
@@ -79,7 +79,7 @@ class RTLeaner(object):
             # converting splitval from ndarray to integer
             splitval = (d[randrow1, randcol] + d[randrow2, randcol]) / 2
             # print ("splitval: ", splitval[0])
-            print splitval
+            print (splitval)
 
             # LEAF SIZE CRITERIA CHECK ensure leaf size check and tree is built according to given leaf size
             if d.shape[0] <= leafsize:
@@ -121,9 +121,9 @@ class RTLeaner(object):
             rightTree = self.build_tree(rightTreeList)
             rightTreeIndex = (len(leftTree)) + 1
             root = [randcol, splitval, 1, rightTreeIndex]
-            print root
-            print leftTree
-            print rightTree
+            print (root)
+            print (leftTree)
+            print (rightTree)
             return node
 
     def query(self, dataX):
@@ -137,7 +137,7 @@ class RTLeaner(object):
     def traverse_tree(self, d, r):
         global btree
         currNode = btree[r]
-        print currNode
+        print (currNode)
 
         if currNode[0] == 'leaf':
             result = currNode[1]
