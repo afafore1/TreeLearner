@@ -35,7 +35,7 @@ class RTLeaner(object):
         btree = self.build_tree(data)
         btree.pop()
         print ("---- PRINT BTREE ------")
-        print (btree)
+        #print (btree)
         print ("---- COMPLETED PRINTING B-TREE ----")
         return "done"
 
@@ -102,6 +102,7 @@ class RTLeaner(object):
                 randrow1 = random.randint(0, datarow - 1)
                 randrow2 = random.randint(0, datarow - 1)
 
+            splitval = (d[randrow1, randcol] + d[randrow2, randcol]) / 2
             # if still unsplittable then create a leaf
             if len(d) == len(d[d[:, randcol] <= splitval]):
                 #randcol = random.randint(0, datacol - 2)
@@ -111,15 +112,19 @@ class RTLeaner(object):
                 node.append(leafList)
                 return leafList
 
-            leftTreeList = d[d[:, randcol] <= splitval]
-            rightTreeList = d[d[:, randcol] > splitval]
+            lT = d[d[:, randcol] <= splitval]
+            rT = d[d[:, randcol] > splitval]
+            lunique = [tuple(row) for row in lT]
+            runique = [tuple(row) for row in rT]
+            leftTreeList = np.unique(lunique)
+            rightTreeList = np.unique(runique)
             resultList = [randcol, splitval, 1, len(leftTreeList) + 1]
             if np.all(d[:, -1] == d[0, -1], axis=0):
                 resultList = [randcol, splitval, 1, len(leftTreeList) + 1]
             node.append(resultList)
             leftTree = self.build_tree(leftTreeList)
+            rightTreeIndex = (len(leftTreeList)) + 1
             rightTree = self.build_tree(rightTreeList)
-            rightTreeIndex = (len(leftTree)) + 1
             root = [randcol, splitval, 1, rightTreeIndex]
             print (root)
             print (leftTree)
@@ -148,6 +153,6 @@ class RTLeaner(object):
             print(currNode[2])
             r += int(currNode[2])
 
-        if d[compFactor] > currNode[1]:
+        else:
             r += int(currNode[3])
         return self.traverse_tree(d, r)
